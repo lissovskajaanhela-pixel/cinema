@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOIR — Бесславные ублюдки</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap');
+
+:root {
+  --black: #171714;
+  --paper: #e9e5dc;
+  --muted: #88867e;
+  --red: #b43b32;
+  --line: rgba(233,229,220,.17);
+  --green: #9baf91;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--black);
+  color: var(--paper);
+  font-family: 'Manrope', sans-serif;
+}
+
+button, input { font: inherit; }
+
+.topbar {
+  height: 76px;
+  padding: 0 6%;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: 5px;
+}
+
+.logo span { color: var(--red); }
+
+.top-info {
+  font: 10px 'DM Mono', monospace;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+
+main {
+  max-width: 1440px;
+  margin: auto;
+  padding: 55px 6% 90px;
+}
+
+.eyebrow {
+  color: var(--red);
+  font: 11px 'DM Mono', monospace;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.movie-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 30px;
+  margin-bottom: 42px;
+}
+
+h1 {
+  font: 500 clamp(43px, 7vw, 88px)/.98 'Playfair Display', serif;
+  letter-spacing: -3px;
+  margin: 15px 0;
+  max-width: 850px;
+}
+
+h1 em { color: var(--red); }
+
+.movie-description {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 2;
+}
+
+.session {
+  display: flex;
+  gap: 35px;
+  padding: 17px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 42px;
+}
+
+.session-item small {
+  display: block;
+  color: var(--muted);
+  font: 10px 'DM Mono', monospace;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.session-item strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.session-item.time strong {
+  color: var(--red);
+  font-size: 21px;
+}
+
+.booking-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 65px;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.section-heading h2 {
+  font: 500 25px 'Playfair Display', serif;
+  margin: 0;
+}
+
+.section-heading span {
+  font: 10px 'DM Mono', monospace;
+  color: var(--muted);
+}
+
+.screen-area {
+  perspective: 600px;
+  margin: 0 auto 43px;
+  width: 76%;
+}
+
+.screen {
+  height: 43px;
+  border-top: 2px solid var(--paper);
+  border-radius: 50% 50% 0 0;
+  transform: rotateX(-15deg);
+  box-shadow: 0 -12px 35px rgba(233,229,220,.08);
+}
+
+.screen-label {
+  text-align: center;
+  font: 9px 'DM Mono', monospace;
+  letter-spacing: 5px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+.seat-grid {
+  display: grid;
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+  gap: 10px 7px;
+  max-width: 690px;
+  margin: auto;
+}
+
+.seat {
+  aspect-ratio: 1.15;
+  border: 1px solid rgba(233,229,220,.4);
+  background: transparent;
+  color: var(--paper);
+  border-radius: 4px 4px 2px 2px;
+  font: 9px 'DM Mono', monospace;
+  cursor: pointer;
+  transition: .18s ease;
+  position: relative;
+}
+
+.seat::after {
+  content: '';
+  position: absolute;
+  height: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: -4px;
+  background: inherit;
+  border: 1px solid currentColor;
+  opacity: .5;
+  border-radius: 0 0 3px 3px;
+}
+
+.seat:hover:not(:disabled) {
+  border-color: var(--paper);
+  transform: translateY(-3px);
+}
+
+.seat.selected {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+}
+
+.seat.occupied {
+  background: #45443f;
+  border-color: #45443f;
+  color: #77766f;
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.order-panel {
+  border-left: 1px solid var(--line);
+  padding-left: 30px;
+}
+
+.order-panel h2 {
+  font: 500 25px 'Playfair Display', serif;
+  margin: 0 0 8px;
+}
+
+.order-caption {
+  font: 10px 'DM Mono', monospace;
+  color: var(--muted);
+  margin-bottom: 27px;
+}
+
+.selected-list {
+  min-height: 95px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 0;
+}
+
+.empty {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.selected-seat {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 12px;
+}
+
+.selected-seat button {
+  color: var(--muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 0;
+}
+
+.total span:first-child {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.total-price {
+  font: 500 27px 'Playfair Display', serif;
+}
+
+.form-title {
+  font: 500 19px 'Playfair Display', serif;
+  margin: 10px 0 20px;
+}
+
+.field { margin-bottom: 16px; }
+
+.field label {
+  display: block;
+  font: 9px 'DM Mono', monospace;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.field input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0;
+  outline: none;
+  color: var(--paper);
+  font-size: 13px;
+}
+
+.field input:focus { border-color: var(--red); }
+.field input.invalid { border-color: var(--red); }
+
+.error {
+  color: #d4776c;
+  font-size: 10px;
+  display: block;
+  min-height: 14px;
+  margin-top: 5px;
+}
+
+.submit {
+  background: var(--red);
+  color: white;
+  border: 0;
+  width: 100%;
+  padding: 17px;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: .2s;
+  margin-top: 9px;
+}
+
+.submit:hover { background: #96312a; }
+.submit:disabled { opacity: .35; cursor: not-allowed; }
+
+.note {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin-top: 15px;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin-top: 42px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.legend-box {
+  width: 13px;
+  height: 13px;
+  border: 1px solid rgba(233,229,220,.5);
+  border-radius: 3px;
+}
+
+.legend-box.chosen {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.legend-box.busy {
+  background: #45443f;
+  border-color: #45443f;
+}
+
+.footer {
+  margin-top: 80px;
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font: 9px 'DM Mono', monospace;
+  letter-spacing: 1px;
+}
+
+.success {
+  display: none;
+  padding: 15px;
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 15px;
+}
+
+@media(max-width: 850px) {
+  main { padding: 40px 5% 60px; }
+
+  .booking-layout {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .order-panel {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 30px 0 0;
+  }
+
+  .movie-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .seat-grid { gap: 8px 5px; }
+}
+
+@media(max-width: 480px) {
+  .topbar { padding: 0 5%; }
+  .top-info { font-size: 8px; }
+
+  .session {
+    gap: 17px;
+    flex-wrap: wrap;
+  }
+
+  .session-item strong { font-size: 11px; }
+  .seat-grid { gap: 7px 4px; }
+  .seat { font-size: 7px; }
+  .legend { gap: 15px; }
+  h1 { letter-spacing: -2px; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="logo">NO<span>IR</span></div>
+  <div class="top-info">INDEPENDENT CINEMA / № 015</div>
+</header>
+
+<main>
+
+  <div class="movie-heading">
+    <div>
+      <div class="eyebrow">Tonight's screening — 015</div>
+      <h1>Бесславные <em>ублюдки</em></h1>
+      <div class="movie-description">
+        INGLOURIOUS BASTERDS · 2009 · ВОЕННАЯ ДРАМА · 18+
+      </div>
+    </div>
+
+    <div class="movie-description">
+      Квентин Тарантино<br>
+      История мести, написанная кровью.
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-item">
+      <small>Дата</small>
+      <strong>02 ноября 2026</strong>
+    </div>
+
+    <div class="session-item time">
+      <small>Начало</small>
+      <strong>19:30</strong>
+    </div>
+
+    <div class="session-item">
+      <small>Зал</small>
+      <strong>№ 02 / BLACK ROOM</strong>
+    </div>
+
+    <div class="session-item">
+      <small>Продолжительность</small>
+      <strong>2 ч 33 мин</strong>
+    </div>
+  </div>
+
+  <div class="booking-layout">
+
+    <section>
+      <div class="section-heading">
+        <h2>Выберите места</h2>
+        <span>10 РЯДОВ / 15 МЕСТ</span>
+      </div>
+
+      <div class="screen-area">
+        <div class="screen"></div>
+        <div class="screen-label">Э К Р А Н</div>
+      </div>
+
+      <div id="seatGrid" class="seat-grid"></div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <span class="legend-box"></span> Свободно
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-box chosen"></span> Выбрано
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-box busy"></span> Занято
+        </div>
+      </div>
+    </section>
+
+    <aside class="order-panel">
+
+      <h2>Ваш заказ</h2>
+      <div class="order-caption">БИЛЕТЫ / BOOKING № 015</div>
+
+      <div id="selectedList" class="selected-list">
+        <div class="empty">
+          Вы пока не выбрали места.<br>
+          Нажмите на свободное место в зале.
+        </div>
+      </div>
+
+      <div class="total">
+        <span>Итого к оплате</span>
+        <span class="total-price" id="totalPrice">0 ₽</span>
+      </div>
+
+      <div class="form-title">Данные зрителя</div>
+
+      <form id="bookingForm" novalidate>
+
+        <div class="field">
+          <label for="visitorName">Имя и фамилия</label>
+          <input
+            id="visitorName"
+            type="text"
+            placeholder="Александр Иванов"
+            autocomplete="name"
+          >
+          <span class="error" id="nameError"></span>
+        </div>
+
+        <div class="field">
+          <label for="visitorPhone">Телефон</label>
+          <input
+            id="visitorPhone"
+            type="tel"
+            placeholder="+7 999 123-45-67"
+            autocomplete="tel"
+          >
+          <span class="error" id="phoneError"></span>
+        </div>
+
+        <button class="submit" id="submitButton" type="submit" disabled>
+          Забронировать билеты →
+        </button>
+
+      </form>
+
+      <div class="success" id="successMessage"></div>
+
+      <div class="note">
+        После подтверждения выбранные места становятся недоступны
+        для других зрителей в этом браузере.
+      </div>
+
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <span>NOIR CINEMA © 2026</span>
+    <span>GOOD FILMS. DARK ROOMS.</span>
+  </footer>
+
+</main>
+
+<script>
+const PRICE = 450;
+const ROWS = 10;
+const COLS = 15;
+const SESSION_ID = 'noir-session-015';
+
+const grid = document.getElementById('seatGrid');
+const selectedList = document.getElementById('selectedList');
+const totalPrice = document.getElementById('totalPrice');
+const submitButton = document.getElementById('submitButton');
+
+let selected = JSON.parse(
+  sessionStorage.getItem('noir-selected-' + SESSION_ID) || '[]'
+);
+
+function createSession() {
+  const sessions = JSON.parse(
+    localStorage.getItem('noir-sessions') || '[]'
+  );
+
+  let session = sessions.find(s => s.id === SESSION_ID);
+
+  if (!session) {
+    session = {
+      id: SESSION_ID,
+      movie: 'Бесславные ублюдки',
+      date: '2026-11-02',
+      seats: []
+    };
+
+    const occupied = [
+      '1-4', '1-5', '1-6',
+      '2-9', '2-10',
+      '3-3', '3-4',
+      '5-7', '5-8',
+      '7-12', '7-13',
+      '9-2', '9-3'
+    ];
+
+    for (let row = 1; row <= ROWS; row++) {
+      for (let number = 1; number <= COLS; number++) {
+        const key = `${row}-${number}`;
+
+        session.seats.push({
+          row,
+          number,
+          status: occupied.includes(key) ? 'occupied' : 'free'
+        });
+      }
+    }
+
+    sessions.push(session);
+
+    localStorage.setItem(
+      'noir-sessions',
+      JSON.stringify(sessions)
+    );
+  }
+
+  return session;
+}
+
+let session = createSession();
+
+sessionStorage.setItem('noir-current-session', SESSION_ID);
+
+function saveSession() {
+  const sessions = JSON.parse(
+    localStorage.getItem('noir-sessions') || '[]'
+  );
+
+  const index = sessions.findIndex(s => s.id === SESSION_ID);
+
+  if (index !== -1) {
+    sessions[index] = session;
+  }
+
+  localStorage.setItem(
+    'noir-sessions',
+    JSON.stringify(sessions)
+  );
+}
+
+function saveSelection() {
+  sessionStorage.setItem(
+    'noir-selected-' + SESSION_ID,
+    JSON.stringify(selected)
+  );
+}
+
+function isSelected(row, number) {
+  return selected.some(
+    s => s.row === row && s.number === number
+  );
+}
+
+function renderSeats() {
+  grid.innerHTML = '';
+
+  session.seats.forEach(seat => {
+    const button = document.createElement('button');
+
+    button.type = 'button';
+    button.className = 'seat';
+
+    const chosen = isSelected(seat.row, seat.number);
+
+    if (
+      seat.status === 'occupied' ||
+      seat.status === 'booked'
+    ) {
+      button.classList.add('occupied');
+      button.disabled = true;
+      button.title = 'Место занято';
+    } else if (chosen) {
+      button.classList.add('selected');
+      button.title = 'Отменить выбор';
+    } else {
+      button.title = 'Выбрать место';
+    }
+
+    button.textContent = seat.number;
+
+    button.setAttribute(
+      'aria-label',
+      `Ряд ${seat.row}, место ${seat.number}`
+    );
+
+    if (seat.number === 8) {
+      button.style.marginLeft = '7px';
+    }
+
+    button.addEventListener('click', () => {
+      if (seat.status !== 'free') return;
+
+      if (isSelected(seat.row, seat.number)) {
+        selected = selected.filter(
+          s => !(s.row === seat.row && s.number === seat.number)
+        );
+      } else {
+        selected.push({
+          row: seat.row,
+          number: seat.number
+        });
+      }
+
+      saveSelection();
+      renderSeats();
+      renderOrder();
+      validateForm();
+    });
+
+    grid.appendChild(button);
+  });
+}
+
+function renderOrder() {
+  selectedList.innerHTML = '';
+
+  if (selected.length === 0) {
+    const empty = document.createElement('div');
+
+    empty.className = 'empty';
+    empty.innerHTML =
+      'Вы пока не выбрали места.<br>' +
+      'Нажмите на свободное место в зале.';
+
+    selectedList.appendChild(empty);
+  } else {
+    selected.forEach(seat => {
+      const item = document.createElement('div');
+      item.className = 'selected-seat';
+
+      const label = document.createElement('span');
+
+      label.textContent =
+        `Ряд ${seat.row} / Место ${seat.number}`;
+
+      const remove = document.createElement('button');
+
+      remove.type = 'button';
+      remove.textContent = '×';
+
+      remove.addEventListener('click', () => {
+        selected = selected.filter(
+          s => !(s.row === seat.row && s.number === seat.number)
+        );
+
+        saveSelection();
+        renderSeats();
+        renderOrder();
+        validateForm();
+      });
+
+      item.append(label, remove);
+      selectedList.appendChild(item);
+    });
+  }
+
+  totalPrice.textContent =
+    (selected.length * PRICE).toLocaleString('ru-RU') + ' ₽';
+}
+
+const nameInput = document.getElementById('visitorName');
+const phoneInput = document.getElementById('visitorPhone');
+
+const nameRegex = /^[А-Яа-яЁёA-Za-z\s-]{2,30}$/;
+const phoneRegex = /^(?:\+7|8)\d{10}$/;
+
+function validateName() {
+  const value = nameInput.value.trim();
+  const valid = nameRegex.test(value);
+
+  document.getElementById('nameError').textContent =
+    value && !valid
+      ? 'Введите имя: 2–30 букв, без цифр.'
+      : '';
+
+  nameInput.classList.toggle(
+    'invalid',
+    value.length > 0 && !valid
+  );
+
+  return valid;
+}
+
+function validatePhone() {
+  const value = phoneInput.value.replace(/[\s()-]/g, '');
+  const valid = phoneRegex.test(value);
+
+  document.getElementById('phoneError').textContent =
+    value && !valid
+      ? 'Формат: +7XXXXXXXXXX или 8XXXXXXXXXX'
+      : '';
+
+  phoneInput.classList.toggle(
+    'invalid',
+    value.length > 0 && !valid
+  );
+
+  return valid;
+}
+
+function validateForm() {
+  const nameValid = validateName();
+  const phoneValid = validatePhone();
+  const seatsValid = selected.length > 0;
+
+  const valid = nameValid && phoneValid && seatsValid;
+
+  submitButton.disabled = !valid;
+
+  return valid;
+}
+
+nameInput.addEventListener('input', validateForm);
+phoneInput.addEventListener('input', validateForm);
+
+document.getElementById('bookingForm').addEventListener('submit', e => {
+  e.preventDefault();
+
+  if (!validateForm()) return;
+
+  const latest = JSON.parse(
+    localStorage.getItem('noir-sessions') || '[]'
+  );
+
+  const current = latest.find(
+    s => s.id === SESSION_ID
+  );
+
+  if (!current) return;
+
+  const unavailable = selected.some(choice => {
+    const seat = current.seats.find(
+      s => s.row === choice.row && s.number === choice.number
+    );
+
+    return !seat || seat.status !== 'free';
+  });
+
+  if (unavailable) {
+    alert('Некоторые места уже заняты. Обновите выбор.');
+
+    session = current;
+
+    selected = selected.filter(choice => {
+      const seat = session.seats.find(
+        s => s.row === choice.row && s.number === choice.number
+      );
+
+      return seat && seat.status === 'free';
+    });
+
+    saveSelection();
+    renderSeats();
+    renderOrder();
+    validateForm();
+
+    return;
+  }
+
+  selected.forEach(choice => {
+    const seat = session.seats.find(
+      s => s.row === choice.row && s.number === choice.number
+    );
+
+    if (seat) seat.status = 'booked';
+  });
+
+  saveSession();
+
+  const bookingNumber = 'NR-' +
+    Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  const message = document.getElementById('successMessage');
+
+  message.style.display = 'block';
+
+  message.textContent =
+    `Бронирование ${bookingNumber} подтверждено! ` +
+    `Мест: ${selected.length}. Сумма: ` +
+    (selected.length * PRICE).toLocaleString('ru-RU') +
+    ' ₽. Спасибо за выбор NOIR.';
+
+  selected = [];
+
+  saveSelection();
+  renderSeats();
+  renderOrder();
+
+  document.getElementById('bookingForm').reset();
+
+  submitButton.disabled = true;
+});
+
+selected = selected.filter(choice => {
+  const seat = session.seats.find(
+    s => s.row === choice.row && s.number === choice.number
+  );
+
+  return seat && seat.status === 'free';
+});
+
+saveSelection();
+
+renderSeats();
+renderOrder();
+validateForm();
+</script>
+
+</body>
+</html>
